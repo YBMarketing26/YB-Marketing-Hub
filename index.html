@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yoga Barn Marketing Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f2ea; --card:#fffdf8; --ink:#2f332c; --muted:#6f7368; --line:#e3ddd0;
+    --sage:#5d6b55; --sage-dark:#3f4a3c; --clay:#b8714f; --soft:#eef0e8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Inter,system-ui,sans-serif}
+  header{padding:40px 16px 20px;text-align:center}
+  h1{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:2.4rem;margin:0;color:var(--sage-dark)}
+  header p{color:var(--muted);margin:6px auto 0;max-width:540px}
+  .tabs{display:flex;justify-content:center;gap:8px;margin:20px 0 0}
+  .tab{border:1px solid var(--line);background:var(--card);padding:9px 18px;border-radius:999px;cursor:pointer;font:inherit;color:var(--ink)}
+  .tab.active{background:var(--sage-dark);color:#fff;border-color:var(--sage-dark)}
+  main{max-width:860px;margin:0 auto;padding:16px 16px 60px}
+  .panel{display:none}.panel.active{display:block}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .full{grid-column:1/-1}
+  label{display:block;font-weight:500;font-size:.88rem;margin-bottom:6px}
+  label .req{color:var(--clay)}
+  input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:#fff;color:var(--ink)}
+  textarea{min-height:130px;resize:vertical}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--sage);outline-offset:-1px}
+  .hint{font-size:.82rem;color:var(--muted);margin-top:5px}
+  .warn{background:#fbeee6;border:1px solid #ecc9b5;color:#7a3f22;padding:10px 12px;border-radius:9px;font-size:.88rem;margin-top:8px;display:none}
+  .checks{display:flex;flex-wrap:wrap;gap:8px}
+  .checks label{display:flex;align-items:center;gap:6px;font-weight:400;border:1px solid var(--line);padding:6px 11px;border-radius:999px;background:#fff;margin:0;cursor:pointer}
+  .checks input{width:auto;margin:0}
+  button.primary{background:var(--sage-dark);color:#fff;border:0;padding:12px 26px;border-radius:999px;font:inherit;font-weight:600;cursor:pointer}
+  button.primary:disabled{opacity:.6;cursor:wait}
+  .msg{margin-top:14px;padding:12px 14px;border-radius:9px;display:none}
+  .msg.ok{display:block;background:var(--soft);color:var(--sage-dark)}
+  .msg.err{display:block;background:#fbeee6;color:#7a3f22}
+  .guide{margin-bottom:16px;font-size:.9rem;color:var(--muted)}
+  .guide b{color:var(--ink)}
+  /* Board */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:14px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .stat b{display:block;font-size:1.5rem;font-family:"Cormorant Garamond",serif}
+  .stat span{font-size:.8rem;color:var(--muted)}
+  .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .filters select,.filters input{width:auto;flex:1;min-width:150px}
+  .req-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:10px}
+  .req-top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start}
+  .req-card h3{margin:2px 0 4px;font-size:1rem}
+  .meta{font-size:.82rem;color:var(--muted)}
+  .pill{display:inline-block;font-size:.75rem;padding:3px 10px;border-radius:999px;font-weight:600;white-space:nowrap}
+  .s-New{background:#e8eef7;color:#2c4a73}.s-In-Review{background:#f4ecd9;color:#6b5420}
+  .s-In-Progress{background:#efe3f4;color:#5a2f6b}.s-Waiting-Feedback{background:#fbeee6;color:#7a3f22}
+  .s-Done{background:var(--soft);color:var(--sage-dark)}.s-Declined{background:#eee;color:#666}
+  .rush{background:var(--clay);color:#fff;margin-left:6px}
+  details{margin-top:8px;font-size:.9rem}
+  summary{cursor:pointer;color:var(--sage);font-weight:500}
+  .brief{white-space:pre-wrap;margin:8px 0 0}
+  .empty{text-align:center;color:var(--muted);padding:30px}
+  @media (max-width:640px){.grid{grid-template-columns:1fr}h1{font-size:2rem}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Marketing Hub</h1>
+  <p>One place for every team at Yoga Barn to request marketing support. Submit your request, then follow its progress on the board.</p>
+  <div class="tabs">
+    <button class="tab active" data-tab="form">Submit a request</button>
+    <button class="tab" data-tab="board">Request board</button>
+  </div>
+</header>
+
+<main>
+  <!-- FORM -->
+  <section id="form" class="panel active">
+    <div class="guide card">
+      <b>Before you submit:</b> please plan ahead. Suggested lead times —
+      Design 7 days · Social post 5 days · Newsletter 7 days · Photo shoot 3 days · Video shoot 5 days · Event promo &amp; PR 21 days.
+      A clear brief and good references help us deliver faster.
+    </div>
+    <form id="reqForm" class="card" novalidate>
+      <div class="grid">
+        <div><label>Your name <span class="req">*</span></label><input name="name" required></div>
+        <div><label>Email</label><input name="email" type="email" placeholder="so we can follow up"></div>
+        <div><label>Department <span class="req">*</span></label>
+          <select name="department" required>
+            <option value="">Select…</option>
+            <option>Studio / Classes</option><option>Retreats &amp; Trainings</option>
+            <option>Café / F&amp;B</option><option>Front Desk / Guest Relations</option><option>HR</option><option>Management / Others</option>
+          </select></div>
+        <div><label>Request type <span class="req">*</span></label>
+          <select name="type" id="type" required>
+            <option value="">Select…</option>
+            <option data-days="7">Design (poster, social, signage)</option>
+            <option data-days="5">Social media post / story</option>
+            <option data-days="7">Newsletter / email blast</option>
+            <option data-days="21">Event promo &amp; PR / media</option>
+            <option data-days="5">Video shoot</option>
+            <option data-days="3">Photo shoot</option>
+          </select></div>
+        <div class="full"><label>Title <span class="req">*</span></label><input name="title" required placeholder="e.g. Full Moon Sound Healing — poster for Oct 17"></div>
+        <div class="full"><label>Brief <span class="req">*</span></label>
+          <textarea name="brief" required placeholder="What is it, who is it for, key message, date/time/price, any must-have info or wording… For photo/video shoots: shoot date &amp; time, location, people involved, shot list, final format (e.g. Reels, photos for website)."></textarea></div>
+        <div class="full"><label>Where will it be used?</label>
+          <div class="checks">
+            <label><input type="checkbox" name="channels" value="Instagram">Instagram</label>
+            <label><input type="checkbox" name="channels" value="Website">Website</label>
+            <label><input type="checkbox" name="channels" value="Newsletter">Newsletter</label>
+            <label><input type="checkbox" name="channels" value="WhatsApp">WhatsApp</label>
+            <label><input type="checkbox" name="channels" value="Print / signage">Print / signage</label>
+            <label><input type="checkbox" name="channels" value="Screen / TV">Screen / TV</label>
+          </div></div>
+        <div><label>Needed by <span class="req">*</span></label><input name="deadline" id="deadline" type="date" required>
+          <div class="hint" id="leadHint"></div></div>
+        <div><label>Priority</label>
+          <select name="priority"><option>Normal</option><option>High</option><option>Low</option></select></div>
+        <div class="full"><label>Reference / assets link</label><input name="reference" type="url" placeholder="Google Drive, Canva, photos, examples…"></div>
+      </div>
+      <div class="warn" id="rushWarn">This deadline is shorter than our suggested lead time. We'll do our best, but it may need to be adjusted or simplified.</div>
+      <div style="margin-top:20px"><button class="primary" type="submit" id="submitBtn">Submit request</button></div>
+      <div class="msg" id="formMsg"></div>
+    </form>
+  </section>
+
+  <!-- BOARD -->
+  <section id="board" class="panel">
+    <div class="stats" id="stats"></div>
+    <div class="filters">
+      <select id="fStatus"><option value="">All statuses</option></select>
+      <select id="fDept"><option value="">All departments</option></select>
+      <input id="fSearch" placeholder="Search title or ID…">
+    </div>
+    <div id="list"><div class="empty">Loading…</div></div>
+  </section>
+</main>
+
+<script>
+  // ===== CONFIG: paste your Apps Script Web App URL here =====
+  const API_URL = "https://script.google.com/macros/s/AKfycbyRdv_fcBfJT2W3Tb8bMPfQdt9Clm5y_DkJLq_NhQjRGFqpbCxKxSJ4ZwMJE7pOAAyDhg/exec";
+  const STATUSES = ["New","In Review","In Progress","Waiting Feedback","Done","Declined"];
+
+  const $ = s => document.querySelector(s);
+  let rows = [], loaded = false;
+
+  // Tabs
+  document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
+    document.querySelectorAll(".tab,.panel").forEach(e => e.classList.remove("active"));
+    t.classList.add("active"); $("#" + t.dataset.tab).classList.add("active");
+    if (t.dataset.tab === "board" && !loaded) loadBoard();
+  });
+
+  // Lead-time check
+  const daysUntil = d => Math.ceil((new Date(d + "T00:00:00") - new Date().setHours(0,0,0,0)) / 864e5);
+  function checkLead() {
+    const opt = $("#type").selectedOptions[0], need = opt && +opt.dataset.days;
+    const d = $("#deadline").value;
+    $("#leadHint").textContent = need ? `Suggested lead time: ${need} days` : "";
+    const rush = !!(need && d && daysUntil(d) < need);
+    $("#rushWarn").style.display = rush ? "block" : "none";
+    return rush;
+  }
+  $("#type").onchange = checkLead; $("#deadline").onchange = checkLead;
+  $("#deadline").min = new Date().toISOString().slice(0,10);
+
+  // Submit
+  $("#reqForm").onsubmit = async e => {
+    e.preventDefault();
+    const f = e.target, msg = $("#formMsg");
+    msg.className = "msg";
+    if (!f.checkValidity()) { f.reportValidity(); return; }
+    const fd = new FormData(f);
+    const data = Object.fromEntries(fd.entries());
+    data.channels = fd.getAll("channels");
+    data.rush = checkLead();
+    const btn = $("#submitBtn"); btn.disabled = true; btn.textContent = "Sending…";
+    try {
+      const res = await fetch(API_URL, { method: "POST", body: JSON.stringify(data) });
+      const out = await res.json();
+      if (!out.ok) throw new Error(out.error);
+      msg.className = "msg ok";
+      msg.textContent = `Thank you — your request ${out.id} has been received. You can follow it on the Request board.`;
+      f.reset(); checkLead(); loaded = false;
+    } catch (err) {
+      msg.className = "msg err";
+      msg.textContent = "Something went wrong and the request wasn't sent. Please try again or message the marketing team.";
+    } finally { btn.disabled = false; btn.textContent = "Submit request"; }
+  };
+
+  // Board
+  async function loadBoard() {
+    $("#list").innerHTML = '<div class="empty">Loading…</div>';
+    try {
+      const out = await (await fetch(API_URL)).json();
+      rows = (out.rows || []).reverse(); loaded = true;
+      fillFilters(); render();
+    } catch { $("#list").innerHTML = '<div class="empty">Could not load requests.</div>'; }
+  }
+  function fillFilters() {
+    $("#fStatus").innerHTML = '<option value="">All statuses</option>' + STATUSES.map(s => `<option>${s}</option>`).join("");
+    const depts = [...new Set(rows.map(r => r.Department))].filter(Boolean);
+    $("#fDept").innerHTML = '<option value="">All departments</option>' + depts.map(d => `<option>${esc(d)}</option>`).join("");
+  }
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  function render() {
+    const st = $("#fStatus").value, dp = $("#fDept").value, q = $("#fSearch").value.toLowerCase();
+    const open = rows.filter(r => !["Done","Declined"].includes(r.Status));
+    $("#stats").innerHTML = [
+      ["Open", open.length], ["New", rows.filter(r => r.Status === "New").length],
+      ["In progress", rows.filter(r => r.Status === "In Progress").length],
+      ["Due in 7 days", open.filter(r => r.Deadline && daysUntil(r.Deadline) <= 7).length],
+      ["Done", rows.filter(r => r.Status === "Done").length]
+    ].map(([l,n]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join("");
+    const list = rows.filter(r => (!st || r.Status === st) && (!dp || r.Department === dp) &&
+      (!q || (r.Title + " " + r.ID).toLowerCase().includes(q)));
+    $("#list").innerHTML = list.length ? list.map(r => `
+      <div class="req-card">
+        <div class="req-top">
+          <div>
+            <div class="meta">${esc(r.ID)} · ${esc(r.Department)} · ${esc(r["Request Type"])}</div>
+            <h3>${esc(r.Title)}</h3>
+            <div class="meta">Needed by <b>${esc(r.Deadline)}</b> · Priority ${esc(r.Priority)} · by ${esc(r.Name)}${r["Assigned To"] ? " · Assigned to " + esc(r["Assigned To"]) : ""}</div>
+          </div>
+          <div><span class="pill s-${esc(String(r.Status).replace(/ /g,"-"))}">${esc(r.Status)}</span>${r.Rush ? '<span class="pill rush">Rush</span>' : ""}</div>
+        </div>
+        <details><summary>Brief &amp; notes</summary>
+          <p class="brief">${esc(r.Brief)}</p>
+          ${r.Channels ? `<p class="meta">Channels: ${esc(r.Channels)}</p>` : ""}
+          ${r["Reference Link"] ? `<p class="meta">Reference: <a href="${esc(r["Reference Link"])}" target="_blank" rel="noopener">open link</a></p>` : ""}
+          ${r["Marketing Notes"] ? `<p class="meta"><b>Marketing notes:</b> ${esc(r["Marketing Notes"])}</p>` : ""}
+        </details>
+      </div>`).join("") : '<div class="empty">No requests match.</div>';
+  }
+  ["#fStatus","#fDept"].forEach(s => $(s).onchange = render);
+  $("#fSearch").oninput = render;
+</script>
+</body>
+</html>
