@@ -60,16 +60,24 @@
   summary{cursor:pointer;color:var(--sage);font-weight:500}
   .brief{white-space:pre-wrap;margin:8px 0 0}
   .empty{text-align:center;color:var(--muted);padding:30px}
+  .files-btn{display:inline-block;margin-top:10px;background:var(--sage-dark);color:#fff;text-decoration:none;padding:7px 14px;border-radius:999px;font-size:.85rem;font-weight:600}
+  .lib-group h2{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:1.5rem;color:var(--sage-dark);margin:22px 0 10px}
+  .lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+  .lib-item{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;color:var(--ink);text-decoration:none}
+  a.lib-item:hover{border-color:var(--sage)}
+  .lib-item b{display:block;margin-bottom:3px}
+  .lib-item.soon{opacity:.6}
   @media (max-width:640px){.grid{grid-template-columns:1fr}h1{font-size:2rem}}
 </style>
 </head>
 <body>
 <header>
   <h1>Marketing Hub</h1>
-  <p>One place for every team at Yoga Barn to request marketing support. Submit your request, then follow its progress on the board.</p>
+  <p>One place for every team at Yoga Barn to request marketing support, follow progress and find finished files and brand assets.</p>
   <div class="tabs">
     <button class="tab active" data-tab="form">Submit a request</button>
     <button class="tab" data-tab="board">Request board</button>
+    <button class="tab" data-tab="library">Library</button>
   </div>
 </header>
 
@@ -131,9 +139,15 @@
     <div class="filters">
       <select id="fStatus"><option value="">All statuses</option></select>
       <select id="fDept"><option value="">All departments</option></select>
-      <input id="fSearch" placeholder="Search title or ID…">
+      <input id="fSearch" placeholder="Search title, ID or your name…">
     </div>
     <div id="list"><div class="empty">Loading…</div></div>
+  </section>
+
+  <!-- LIBRARY -->
+  <section id="library" class="panel">
+    <div class="guide card">Looking for a logo, photo, template or schedule? Check here first. Everything the marketing team shares lives in this library.</div>
+    <div id="libList"><div class="empty">Loading…</div></div>
   </section>
 </main>
 
@@ -143,13 +157,13 @@
   const STATUSES = ["New","In Review","In Progress","Waiting Feedback","Done","Declined"];
 
   const $ = s => document.querySelector(s);
-  let rows = [], loaded = false;
+  let rows = [], library = [], loaded = false;
 
   // Tabs
   document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
     document.querySelectorAll(".tab,.panel").forEach(e => e.classList.remove("active"));
     t.classList.add("active"); $("#" + t.dataset.tab).classList.add("active");
-    if (t.dataset.tab === "board" && !loaded) loadBoard();
+    if ((t.dataset.tab === "board" || t.dataset.tab === "library") && !loaded) loadBoard();
   });
 
   // Lead-time check
@@ -191,12 +205,12 @@
 
   // Board
   async function loadBoard() {
-    $("#list").innerHTML = '<div class="empty">Loading…</div>';
+    $("#list").innerHTML = $("#libList").innerHTML = '<div class="empty">Loading…</div>';
     try {
       const out = await (await fetch(API_URL)).json();
-      rows = (out.rows || []).reverse(); loaded = true;
-      fillFilters(); render();
-    } catch { $("#list").innerHTML = '<div class="empty">Could not load requests.</div>'; }
+      rows = (out.rows || []).reverse(); library = out.library || []; loaded = true;
+      fillFilters(); render(); renderLibrary();
+    } catch { $("#list").innerHTML = $("#libList").innerHTML = '<div class="empty">Could not load. Please refresh the page.</div>'; }
   }
   function fillFilters() {
     $("#fStatus").innerHTML = '<option value="">All statuses</option>' + STATUSES.map(s => `<option>${s}</option>`).join("");
@@ -214,7 +228,7 @@
       ["Done", rows.filter(r => r.Status === "Done").length]
     ].map(([l,n]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join("");
     const list = rows.filter(r => (!st || r.Status === st) && (!dp || r.Department === dp) &&
-      (!q || (r.Title + " " + r.ID).toLowerCase().includes(q)));
+      (!q || (r.Title + " " + r.ID + " " + r.Name).toLowerCase().includes(q)));
     $("#list").innerHTML = list.length ? list.map(r => `
       <div class="req-card">
         <div class="req-top">
@@ -225,13 +239,26 @@
           </div>
           <div><span class="pill s-${esc(String(r.Status).replace(/ /g,"-"))}">${esc(r.Status)}</span>${r.Rush ? '<span class="pill rush">Rush</span>' : ""}</div>
         </div>
+        ${safeUrl(r["Result Link"]) ? `<a class="files-btn" href="${esc(safeUrl(r["Result Link"]))}" target="_blank" rel="noopener">📂 Open files</a>` : ""}
         <details><summary>Brief &amp; notes</summary>
           <p class="brief">${esc(r.Brief)}</p>
           ${r.Channels ? `<p class="meta">Channels: ${esc(r.Channels)}</p>` : ""}
-          ${r["Reference Link"] ? `<p class="meta">Reference: <a href="${esc(r["Reference Link"])}" target="_blank" rel="noopener">open link</a></p>` : ""}
+          ${safeUrl(r["Reference Link"]) ? `<p class="meta">Reference: <a href="${esc(safeUrl(r["Reference Link"]))}" target="_blank" rel="noopener">open link</a></p>` : ""}
           ${r["Marketing Notes"] ? `<p class="meta"><b>Marketing notes:</b> ${esc(r["Marketing Notes"])}</p>` : ""}
         </details>
       </div>`).join("") : '<div class="empty">No requests match.</div>';
+  }
+  function safeUrl(u) { u = String(u || "").trim(); return /^https?:\/\//i.test(u) ? u : ""; }
+  function renderLibrary() {
+    if (!library.length) { $("#libList").innerHTML = '<div class="empty">Nothing here yet.</div>'; return; }
+    const groups = {};
+    library.forEach(i => (groups[i.category] = groups[i.category] || []).push(i));
+    $("#libList").innerHTML = Object.entries(groups).map(([cat, items]) => `
+      <div class="lib-group"><h2>${esc(cat)}</h2><div class="lib-grid">
+        ${items.map(i => safeUrl(i.link)
+          ? `<a class="lib-item" href="${esc(safeUrl(i.link))}" target="_blank" rel="noopener"><b>${esc(i.title)}</b><span class="meta">${esc(i.description)}</span></a>`
+          : `<div class="lib-item soon"><b>${esc(i.title)}</b><span class="meta">${esc(i.description)} · coming soon</span></div>`).join("")}
+      </div></div>`).join("");
   }
   ["#fStatus","#fDept"].forEach(s => $(s).onchange = render);
   $("#fSearch").oninput = render;
