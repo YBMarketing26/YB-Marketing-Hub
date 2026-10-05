@@ -31,7 +31,7 @@
   nav{position:sticky;top:0;z-index:50;background:linear-gradient(90deg,var(--nav),color-mix(in srgb,var(--nav) 88%,#c9765c));color:var(--nav-ink)}
   .nav-in{display:flex;align-items:center;gap:20px;height:68px}
   .brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:600;white-space:nowrap}
-  .brand img{height:34px;width:auto;max-width:160px;object-fit:contain}
+  .brand img{height:34px;width:auto;max-width:160px;object-fit:contain;filter:brightness(0) invert(1);opacity:.92}
   .brand .mark{font-size:1.4rem;font-weight:500;letter-spacing:.01em;color:var(--nav-ink)}
   .brand .sub{color:var(--nav-ink);opacity:.8;font-weight:400;font-size:.85rem;letter-spacing:.12em;text-transform:uppercase;padding-left:12px;border-left:1px solid rgba(251,238,220,.4)}
   .links{display:flex;gap:4px;margin:0 auto}
@@ -102,6 +102,8 @@
   .badge-num{background:var(--navy);color:var(--accent-ink);font-weight:700;font-size:.85rem;width:38px;height:38px;border-radius:10px;display:grid;place-items:center}
   .status{font-size:.76rem;font-weight:600;padding:4px 11px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
   .status.av{background:#dfe9e0;border-color:transparent;color:#2f5b45}
+  .av-txt{color:#2f5b45}
+  :root[data-theme="dark"] .av-txt{color:#a8d4bb}
   .status.req{background:var(--clay-soft);border-color:transparent;color:var(--clay)}
   .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
   .tags span{font-size:.78rem;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted)}
@@ -240,8 +242,6 @@
     <div class="links" id="links">
       <a href="#brand">Brand</a>
       <a href="#resources">Resources</a>
-      <a href="#guidelines">Guidelines</a>
-      <a href="#team">Team</a>
       <a href="#track">Track Requests</a>
       <a href="#submit" class="m-only">Submit a Request</a>
     </div>
@@ -258,10 +258,10 @@
   <div class="wrap">
     <div class="eyebrow">Yoga Barn · Marketing Hub</div>
     <h1>Everything you need,<br><em>all in one place.</em></h1>
-    <p class="lead">Find brand assets, resources and guidelines, submit requests and collect finished files — without searching through chats.</p>
+    <p class="lead">Find brand assets and resources, submit requests and collect finished files — without searching through chats.</p>
     <div class="search">
       <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="q" placeholder="Search assets, resources, guidelines, requests…" autocomplete="off" aria-label="Search">
+      <input id="q" placeholder="Search assets, resources, requests…" autocomplete="off" aria-label="Search">
       <kbd>⌘K</kbd>
       <div class="results" id="results"></div>
     </div>
@@ -280,29 +280,15 @@
 
 <section class="block alt" id="resources">
   <div class="wrap">
-    <div class="sec-head"><div><div class="num">02</div><h2>Resources &amp; Downloads</h2><p>Schedules, templates, programme info and print files, shared across every team at Yoga Barn.</p></div></div>
-    <div class="note"><b>Resource status</b><span><b style="color:#2f5b45">Available</b> items open straight away. <b style="color:var(--clay)">By Request</b> items are prepared on demand — submit a request below and we'll send them over.</span></div>
+    <div class="sec-head"><div><div class="num">02</div><h2>Resources &amp; Downloads</h2><p>Schedules, templates and your finished request files — shared across every team at Yoga Barn.</p></div></div>
+    <div class="note"><b>Resource status</b><span><b class="av-txt">Available</b> items open straight away. Your finished request files are in <b>File Request</b>. Need something that isn't here? Submit a request below.</span></div>
     <div class="grid3" id="resList"><div class="empty">Loading…</div></div>
-  </div>
-</section>
-
-<section class="block" id="guidelines">
-  <div class="wrap">
-    <div class="sec-head"><div><div class="num">03</div><h2>Guidelines</h2><p>How Yoga Barn looks, sounds and shows up — so everything we share feels like us.</p></div></div>
-    <div class="g-list" id="guideList"><div class="empty">Loading…</div></div>
-  </div>
-</section>
-
-<section class="block alt" id="team">
-  <div class="wrap">
-    <div class="sec-head"><div><div class="num">04</div><h2>Marketing Team</h2><p>The people behind the requests, and what you can come to each of us for.</p></div></div>
-    <div class="grid4" id="teamList"><div class="empty">Loading…</div></div>
   </div>
 </section>
 
 <section class="block" id="submit">
   <div class="wrap">
-    <div class="sec-head"><div><div class="num">05</div><h2>Submit a Request</h2><p>Need something designed, written, photographed or filmed? Fill this in and the right person will pick it up.</p></div></div>
+    <div class="sec-head"><div><div class="num">03</div><h2>Submit a Request</h2><p>Need something designed, written, photographed or filmed? Fill this in and the right person will pick it up.</p></div></div>
     <div class="form-wrap">
       <aside class="side">
         <div class="rule"></div>
@@ -383,7 +369,7 @@
 
 <section class="block alt" id="track">
   <div class="wrap">
-    <div class="sec-head"><div><div class="num">06</div><h2>Track Requests</h2><p>See where every request is, and open the final files as soon as they're ready.</p></div>
+    <div class="sec-head"><div><div class="num">04</div><h2>Track Requests</h2><p>See where every request is, and open the final files as soon as they're ready.</p></div>
       <button class="btn ghost" type="button" id="refresh">Refresh</button></div>
     <div class="stats" id="stats"></div>
     <div class="filters">
@@ -418,7 +404,7 @@
     ["Video Shoot", 5], ["Video Editing", 3],
     ["Event Promo & PR / Media", 10], ["Other", 2]
   ];
-  const CHANNELS = ["Instagram", "Website", "Newsletter", "WhatsApp", "Print / Signage", "Screen / TV"];
+  const CHANNELS = ["Instagram", "Website", "Newsletter", "WhatsApp", "Print / Signage", "Screen / TV", "Others"];
   const STATUSES = ["New","In Review","In Progress","Waiting Feedback","Done","Declined"];
 
   const $ = s => document.querySelector(s);
@@ -455,6 +441,7 @@
     if (/photo|image|picture/.test(t)) return "image";
     if (/schedule|calendar|event|timetable/.test(t)) return "calendar";
     if (/template|canva/.test(t)) return "template";
+    if (/file request|request/.test(t)) return "doc";
     if (/tone|voice|writ|copy/.test(t)) return "voice";
     if (/consent|privacy|legal|rule/.test(t)) return "shield";
     if (/retreat|training|programme|program/.test(t)) return "leaf";
@@ -494,28 +481,17 @@
 
     const res = bySec("Resources");
     $("#resList").innerHTML = res.length ? res.map((c, i) => {
-      const u = safeUrl(c.link), [label, cls] = statusInfo(c), tag = u ? "a" : "div";
-      const href = u ? linkAttrs(u) : (cls === "req" ? `href="#submit" data-prefill="${esc(c.title)}"` : "");
-      const t2 = (u || cls === "req") ? "a" : "div";
+      const u = safeUrl(c.link);
+      const internal = /^#[\w-]+$/.test(c.link) ? c.link : (!u && /file request/i.test(c.title) ? "#track" : "");
+      let [label, cls] = statusInfo(c);
+      if (internal) [label, cls] = ["Available", "av"];
+      const href = u ? linkAttrs(u) : internal ? `href="${esc(internal)}"` : (cls === "req" ? `href="#submit" data-prefill="${esc(c.title)}"` : "");
+      const t2 = (u || internal || cls === "req") ? "a" : "div";
       return `<${t2} class="card" ${href}>
         <div class="r-top"><span class="badge-num">${String(i+1).padStart(2,"0")}</span><span class="status ${cls}">${label}</span></div>
         <h3>${esc(c.title)}</h3><p>${esc(c.description)}</p>${tagsHtml(c.tags)}
-        ${u ? `<span class="go">Open ${svg("ext",2.2)}</span>` : cls === "req" ? `<span class="go">Request it ${svg("arrow",2.2)}</span>` : ""}</${t2}>`;
+        ${u ? `<span class="go">Open ${svg("ext",2.2)}</span>` : internal ? `<span class="go">View my files ${svg("arrow",2.2)}</span>` : cls === "req" ? `<span class="go">Request it ${svg("arrow",2.2)}</span>` : ""}</${t2}>`;
     }).join("") : '<div class="empty">No resources added yet.</div>';
-
-    const g = bySec("Guidelines");
-    $("#guideList").innerHTML = g.length ? g.map(c => {
-      const u = safeUrl(c.link), tag = u ? "a" : "div";
-      return `<${tag} class="g-item" ${u ? linkAttrs(u) : ""}><span class="icon">${svg(pickIcon(c.title))}</span>
-        <div><b>${esc(c.title)}</b><span>${esc(c.description)}${u ? "" : " · coming soon"}</span></div>${u ? `<span class="arrow">${svg("ext")}</span>` : ""}</${tag}>`;
-    }).join("") : '<div class="empty">No guidelines added yet.</div>';
-
-    const team = bySec("Team");
-    $("#teamList").innerHTML = team.length ? team.map(c => {
-      const img = safeUrl(c.image), initials = c.title.split(/\s+/).map(w => w[0]).slice(0,2).join("").toUpperCase();
-      return `<div class="card person"><div class="avatar">${img ? `<img src="${esc(img)}" alt="${esc(c.title)}" onerror="this.replaceWith(document.createTextNode('${esc(initials)}'))">` : esc(initials)}</div>
-        <h3>${esc(c.title)}</h3><p>${esc(c.description)}</p>${tagsHtml(c.tags)}</div>`;
-    }).join("") : '<div class="empty">No team members added yet.</div>';
 
     const chips = [...bySec("Brand"), ...bySec("Resources")].filter(c => safeUrl(c.link)).slice(0, 6);
     $("#chips").innerHTML = chips.map(c => `<a class="chip" ${linkAttrs(safeUrl(c.link))}>${esc(c.title)}</a>`).join("") +
@@ -555,9 +531,9 @@
     const q = $("#q").value.trim().toLowerCase(), box = $("#results");
     if (!q) { box.classList.remove("show"); return; }
     hits = [];
-    content.filter(c => c.section !== "Announcement").forEach(c => {
+    content.filter(c => ["Brand","Resources"].includes(c.section)).forEach(c => {
       if ((c.title + " " + c.description + " " + c.tags).toLowerCase().includes(q))
-        hits.push({ label: c.title, sub: c.section, url: c.section === "Team" ? "#team" : (safeUrl(c.link) || "#" + c.section.toLowerCase()) });
+        hits.push({ label: c.title, sub: c.section, url: safeUrl(c.link) || "#" + c.section.toLowerCase() });
     });
     rows.forEach(r => {
       if ((r.ID + " " + r.Title + " " + r.Name).toLowerCase().includes(q))
@@ -683,7 +659,7 @@
   $("#refresh").onclick = () => loadData();
 
   /* ---------- Active nav link ---------- */
-  const secs = ["brand","resources","guidelines","team","track"].map(id => document.getElementById(id));
+  const secs = ["brand","resources","track"].map(id => document.getElementById(id));
   addEventListener("scroll", () => {
     const y = scrollY + 120; let cur = "";
     secs.forEach(s => { if (s.offsetTop <= y) cur = s.id; });
@@ -701,7 +677,7 @@
     } catch {
       const msg = '<div class="empty">Could not load. Please refresh the page.</div>';
       $("#list").innerHTML = msg;
-      if (firstLoad) ["#brandList","#resList","#guideList","#teamList"].forEach(s => $(s).innerHTML = msg);
+      if (firstLoad) ["#brandList","#resList"].forEach(s => $(s).innerHTML = msg);
     }
   }
   loadData();
