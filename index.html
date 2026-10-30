@@ -280,7 +280,7 @@
 
 <section class="block alt" id="resources">
   <div class="wrap">
-    <div class="sec-head"><div><div class="num">02</div><h2>Resources &amp; Downloads</h2><p>Schedules, templates and your finished request files — shared across every team at Yoga Barn.</p></div></div>
+    <div class="sec-head"><div><div class="num">02</div><h2>Resources &amp; Downloads</h2><p>Price list, venue map, studio guideline, templates and your finished request files — shared across every team at Yoga Barn.</p></div></div>
     <div class="note"><b>Resource status</b><span><b class="av-txt">Available</b> items open straight away. Your finished request files are in <b>File Request</b>. Need something that isn't here? Submit a request below.</span></div>
     <div class="grid3" id="resList"><div class="empty">Loading…</div></div>
   </div>
@@ -312,9 +312,9 @@
             <div><label class="l" for="dept">Requesting department <i>*</i></label>
               <select class="f" id="dept" name="department" required>
                 <option value="">Select department…</option>
-                <option>Studio / Classes</option><option>Retreats &amp; Trainings</option>
-                <option>Café / F&amp;B</option><option>Front Desk / Guest Relations</option>
-                <option>HR</option><option>Management / Others</option>
+                <option>Retreats &amp; Trainings</option><option>Café / F&amp;B</option>
+                <option>Guest Experience</option><option>Hospitality</option>
+                <option>Wellness</option><option>HR</option><option>Ops / Others</option>
               </select></div>
             <div><label class="l" for="name">Requestor's name <i>*</i></label><input class="f" id="name" name="name" placeholder="Full name" required></div>
             <div><label class="l" for="email">Email address <i>*</i></label><input class="f" id="email" name="email" type="email" placeholder="name@theyogabarn.com" required></div>
@@ -344,8 +344,8 @@
 
             <div class="full"><label class="l" for="brief">Request description / asset details <i>*</i></label>
               <textarea class="f" id="brief" name="brief" required placeholder="Describe what you need. Include who it's for, the key message or exact wording, date/time/price, size or format, and any must-have details. For shoots: date, time, location, people involved and shot list."></textarea>
-              <div class="callout">Minimum 20 words. Please write the actual details — not only the name of the asset.</div>
-              <div class="count" id="count">0 / 20 words minimum</div></div>
+              <div class="callout">Minimum 10 words. Please write the actual details — not only the name of the asset.</div>
+              <div class="count" id="count">0 / 10 words minimum</div></div>
 
             <div class="full"><label class="l" for="ref">Reference links <small>(recommended)</small></label>
               <input class="f" id="ref" name="reference" placeholder="Paste Google Drive, Canva, Dropbox or website links">
@@ -398,9 +398,9 @@
   const API_URL = "https://script.google.com/macros/s/AKfycbyRdv_fcBfJT2W3Tb8bMPfQdt9Clm5y_DkJLq_NhQjRGFqpbCxKxSJ4ZwMJE7pOAAyDhg/exec";
   // Minimum working days per material — edit numbers here if needed
   const MATERIALS = [
-    ["Social Media Post", 1], ["Social Media Story", 1],
-    ["Digital Design (web, screen, email graphic)", 2], ["Print Design (poster, flyer, signage)", 3],
-    ["Newsletter / Email Blast", 2], ["Photo Shoot", 3],
+    ["Social Media Post", 2, "2-5"], ["Social Media Story", 2, "2-5"],
+    ["Digital Design (web, screen, email graphic)", 2, "2-5"], ["Print Design (poster, flyer, signage)", 2, "2-5"],
+    ["Newsletter / Email Blast", 2, "2-5"], ["Photo Shoot", 3],
     ["Video Shoot", 5], ["Video Editing", 3],
     ["Event Promo & PR / Media", 10], ["Other", 2]
   ];
@@ -428,6 +428,9 @@
     leaf:'<path d="M5 19c0-9 6-14 15-14 0 9-5 15-14 15"/><path d="M5 19 13 11"/>',
     ext:'<path d="M14 4h6v6M20 4l-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/>',
     arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+    price:'<path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="8" cy="8" r="1.5"/>',
+    map:'<path d="m9 4-6 2v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/>',
+    guide:'<path d="M4 4h6a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H4z"/><path d="M20 4h-6a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h7z"/>',
     letter:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M4 8h16M8 12h8M8 16h5"/>'
   };
   const svg = (k, sw=1.9) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${I[k]}</svg>`;
@@ -439,6 +442,9 @@
     if (/font|typo/.test(t)) return "type";
     if (/video|film|reel/.test(t)) return "video";
     if (/photo|image|picture/.test(t)) return "image";
+    if (/price|rate|tariff/.test(t)) return "price";
+    if (/map|venue|location/.test(t)) return "map";
+    if (/guideline|rules|etiquette/.test(t)) return "guide";
     if (/schedule|calendar|event|timetable/.test(t)) return "calendar";
     if (/template|canva/.test(t)) return "template";
     if (/file request|request/.test(t)) return "doc";
@@ -564,7 +570,7 @@
   document.addEventListener("keydown", e => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); $("#q").focus(); scrollTo({ top: 0 }); } });
 
   /* ---------- Form ---------- */
-  $("#materials").innerHTML = MATERIALS.map(([m, d]) => `<label class="pill-opt"><input type="checkbox" name="materials" value="${esc(m)}" data-days="${d}"><span>${esc(m)}<small>Min. ${d} working day${d > 1 ? "s" : ""}</small></span></label>`).join("");
+  $("#materials").innerHTML = MATERIALS.map(([m, d, lbl]) => `<label class="pill-opt"><input type="checkbox" name="materials" value="${esc(m)}" data-days="${d}"><span>${esc(m)}<small>Min. ${lbl || d} working day${(lbl || d > 1) ? "s" : ""}</small></span></label>`).join("");
   $("#channels").innerHTML = CHANNELS.map(c => `<label class="pill-opt"><input type="checkbox" name="channels" value="${esc(c)}"><span>${esc(c)}</span></label>`).join("");
   const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
   function addWorkingDays(n){
@@ -585,7 +591,7 @@
   }
   $("#materials").onchange = checkLead; $("#deadline").onchange = checkLead;
   const words = () => ($("#brief").value.trim().match(/\S+/g) || []).length;
-  $("#brief").oninput = () => { const n = words(); $("#count").textContent = `${n} / 20 words minimum`; $("#count").classList.toggle("ok", n >= 20); };
+  $("#brief").oninput = () => { const n = words(); $("#count").textContent = `${n} / 10 words minimum`; $("#count").classList.toggle("ok", n >= 10); };
 
   $("#reqForm").onsubmit = async e => {
     e.preventDefault();
@@ -594,7 +600,7 @@
     const fail = m => { err.textContent = m; err.style.display = "block"; };
     if (!f.checkValidity()) { f.reportValidity(); return; }
     if (!mats.length) { fail("Please select at least one requested material."); $("#materials").scrollIntoView({ block: "center" }); return; }
-    if (words() < 20) { fail("Please add a bit more detail to the description (minimum 20 words)."); $("#brief").focus(); return; }
+    if (words() < 10) { fail("Please add a bit more detail to the description (minimum 10 words)."); $("#brief").focus(); return; }
     const fd = new FormData(f);
     const data = {
       name: fd.get("name"), email: fd.get("email"), whatsapp: fd.get("whatsapp"), department: fd.get("department"),
