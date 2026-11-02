@@ -202,6 +202,35 @@
   .modal-actions svg{width:16px;height:16px}
   .modal-skip{display:block;text-align:center;margin-top:14px;color:var(--muted);font-size:.9rem;background:none;border:0;font:inherit;text-decoration:underline;cursor:pointer;width:100%}
 
+  /* REQUEST ACTIONS */
+  .s-Revision-Requested{background:#f6e3c4;color:#7a4b12}
+  .s-Cancelled{background:var(--bg-alt);color:var(--muted);text-decoration:line-through}
+  :root[data-theme="dark"] .s-Revision-Requested{background:#45351f;color:#f0c98a}
+  .req-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+  .req-actions .btn{margin-top:0}
+  .btn.small{font-size:.8rem;padding:7px 13px}
+  .btn.danger{background:transparent;color:var(--clay);border-color:var(--clay)}
+  .req.cancelled{opacity:.6}
+  .act-form label.l{margin-top:14px}
+  .act-form .err-msg{display:none}
+  .act-sum{background:var(--bg-alt);border-radius:10px;padding:12px 14px;font-size:.9rem;margin-bottom:6px}
+  .act-sum b{display:block;color:var(--ink)}
+  .act-done{text-align:center;padding:10px 0}
+
+  /* LOGIN */
+  body.locked{overflow:hidden}
+  body.locked > :not(#login){visibility:hidden}
+  #login{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:20px;background:var(--bg)}
+  body.locked #login{display:flex}
+  #login::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 20%,var(--accent-soft),transparent 60%);pointer-events:none}
+  .login-box{position:relative;width:100%;max-width:400px;background:var(--card);border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:18px;padding:34px 30px;box-shadow:var(--shadow)}
+  .login-box h2{margin:8px 0 6px;font-size:1.7rem;text-transform:uppercase;letter-spacing:.04em;color:var(--navy)}
+  .login-box p{margin:0 0 20px;color:var(--muted);font-size:.93rem}
+  .login-box label.l{margin-top:14px}
+  .login-box .btn{width:100%;justify-content:center;margin-top:22px}
+  .login-box .err-msg{text-align:center}
+  .signout{background:none;border:0;color:inherit;font:inherit;text-decoration:underline;cursor:pointer;padding:0}
+
   footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);font-size:.88rem}
   footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 
@@ -231,7 +260,7 @@
   }
 </style>
 </head>
-<body>
+<body class="locked">
 
 <nav>
   <div class="wrap nav-in">
@@ -317,7 +346,8 @@
                 <option>Wellness</option><option>HR</option><option>Ops / Others</option>
               </select></div>
             <div><label class="l" for="name">Requestor's name <i>*</i></label><input class="f" id="name" name="name" placeholder="Full name" required></div>
-            <div><label class="l" for="email">Email address <i>*</i></label><input class="f" id="email" name="email" type="email" placeholder="name@theyogabarn.com" required></div>
+            <div><label class="l" for="email">Email address <i>*</i></label><input class="f" id="email" name="email" type="email" placeholder="name@theyogabarn.com" required>
+              <div class="hint">You'll get updates here. Use the same email to cancel or request a revision.</div></div>
             <div><label class="l" for="wa">WhatsApp number <small>(optional)</small></label><input class="f" id="wa" name="whatsapp" type="tel" placeholder="+62 812 3456 7890"></div>
 
             <div class="full"><label class="l">Requested material <i>*</i></label>
@@ -381,7 +411,53 @@
   </div>
 </section>
 
-<footer><div class="wrap"><span>Yoga Barn Marketing Hub</span><span>Questions? Check the board first — your files live there.</span></div></footer>
+<footer><div class="wrap"><span>Yoga Barn Marketing Hub · <button class="signout" id="signOut" type="button">Sign out</button></span><span>Questions? Check the board first — your files live there.</span></div></footer>
+
+<div class="modal" id="actModal" role="dialog" aria-modal="true" aria-labelledby="aTitle">
+  <div class="modal-box">
+    <button class="modal-close" id="aClose" aria-label="Close" type="button">✕</button>
+    <div class="eyebrow" id="aEyebrow"></div>
+    <h3 id="aTitle"></h3>
+    <form class="act-form" id="actForm" novalidate>
+      <div class="act-sum" id="aSum"></div>
+      <label class="l" for="aEmail">Your email <i>*</i> <small>(the one you used for this request)</small></label>
+      <input class="f" id="aEmail" type="email" required placeholder="name@theyogabarn.com">
+      <div id="aRevFields">
+        <label class="l" for="aFeedback">What needs to change? <i>*</i></label>
+        <textarea class="f" id="aFeedback" placeholder="Be specific: which part, what to change, and the correct wording or details."></textarea>
+        <label class="l" for="aRef">Reference link <small>(optional)</small></label>
+        <input class="f" id="aRef" placeholder="Google Drive, Canva or screenshot link">
+      </div>
+      <div id="aCancelFields">
+        <label class="l" for="aReason">Reason for cancelling <small>(optional)</small></label>
+        <textarea class="f" id="aReason" style="min-height:90px" placeholder="e.g. Event postponed, no longer needed"></textarea>
+      </div>
+      <div class="err-msg" id="aErr"></div>
+      <div style="margin-top:22px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" type="submit" id="aSubmit">Send</button>
+        <button class="btn ghost" type="button" id="aBack">Back</button>
+      </div>
+    </form>
+    <div class="act-done" id="actDone" hidden>
+      <p id="aDoneText"></p>
+      <button class="btn" type="button" id="aDoneBtn">Back to board</button>
+    </div>
+  </div>
+</div>
+
+<div id="login" role="dialog" aria-modal="true" aria-labelledby="lTitle">
+  <form class="login-box" id="loginForm" novalidate>
+    <div class="eyebrow">Yoga Barn · Internal</div>
+    <h2 id="lTitle">Marketing Hub</h2>
+    <p>Please sign in with the Yoga Barn team username and password.</p>
+    <label class="l" for="lUser">Username</label>
+    <input class="f" id="lUser" autocomplete="username" required>
+    <label class="l" for="lPass">Password</label>
+    <input class="f" id="lPass" type="password" autocomplete="current-password" required>
+    <button class="btn" type="submit" id="lBtn">Sign in</button>
+    <div class="err-msg" id="lErr"></div>
+  </form>
+</div>
 
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
   <div class="modal-box">
@@ -405,12 +481,24 @@
     ["Event Promo & PR / Media", 10], ["Other", 2]
   ];
   const CHANNELS = ["Instagram", "Website", "Newsletter", "WhatsApp", "Print / Signage", "Screen / TV", "Others"];
-  const STATUSES = ["New","In Review","In Progress","Waiting Feedback","Done","Declined"];
+  const STATUSES = ["New","In Review","In Progress","Waiting Feedback","Revision Requested","Done","Declined","Cancelled"];
+  const CANCELLABLE = ["New","In Review","In Progress","Waiting Feedback","Revision Requested"];
+  const REVISABLE = ["Done","Waiting Feedback"];
 
   const $ = s => document.querySelector(s);
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const safeUrl = u => { u = String(u || "").trim(); return /^https?:\/\//i.test(u) || /^[\w\-./]+\.(jpe?g|png|webp|gif|pdf)$/i.test(u) ? u : ""; };
   const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
+  /* ---------- Login session ---------- */
+  let TOKEN = store.get("ybhub-token") || "";
+  const apiGet = async () => (await fetch(API_URL + "?token=" + encodeURIComponent(TOKEN))).json();
+  const apiPost = async data => (await fetch(API_URL, { method: "POST", body: JSON.stringify({ ...data, token: TOKEN }) })).json();
+  function lock(msg){
+    TOKEN = ""; store.set("ybhub-token", "");
+    document.body.classList.add("locked");
+    $("#lErr").textContent = msg || ""; $("#lErr").style.display = msg ? "block" : "none";
+    setTimeout(() => $("#lUser").focus(), 50);
+  }
   let rows = [], content = [];
 
   /* ---------- Icons ---------- */
@@ -609,7 +697,8 @@
     };
     const btn = $("#sendBtn"); btn.disabled = true; btn.firstChild.textContent = "Sending… ";
     try {
-      const out = await (await fetch(API_URL, { method: "POST", body: JSON.stringify(data) })).json();
+      const out = await apiPost(data);
+      if (out.auth === false) { lock("Your session has ended. Please sign in again — your form is kept."); return; }
       if (!out.ok) throw new Error(out.error);
       $("#newId").textContent = out.id;
       $("#trackNew").onclick = () => { $("#fSearch").value = out.id; loadData(); };
@@ -632,37 +721,93 @@
   }
   function renderBoard(){
     const st = $("#fStatus").value, dp = $("#fDept").value, q = $("#fSearch").value.trim().toLowerCase();
-    const open = rows.filter(r => !["Done","Declined"].includes(r.Status));
+    const open = rows.filter(r => !["Done","Declined","Cancelled"].includes(r.Status));
     $("#stats").innerHTML = [
       ["Open", open.length], ["New", rows.filter(r => r.Status === "New").length],
       ["In progress", rows.filter(r => r.Status === "In Progress").length],
       ["Due in 7 days", open.filter(r => r.Deadline && daysUntil(r.Deadline) <= 7).length],
       ["Done", rows.filter(r => r.Status === "Done").length]
     ].map(([l, n]) => `<div class="stat"><b>${n}</b><span>${l}</span></div>`).join("");
-    const list = rows.filter(r => (!st || r.Status === st) && (!dp || r.Department === dp) &&
+    const list = rows.filter(r => (st ? r.Status === st : r.Status !== "Cancelled") && (!dp || r.Department === dp) &&
       (!q || `${r.Title} ${r.ID} ${r.Name}`.toLowerCase().includes(q)));
     $("#list").innerHTML = list.length ? list.map(r => {
       const res = safeUrl(r["Result Link"]), ref = safeUrl(r["Reference Link"]);
-      return `<div class="req">
+      const canCancel = CANCELLABLE.includes(r.Status), canRevise = REVISABLE.includes(r.Status);
+      const revs = Number(r.Revisions) || 0;
+      return `<div class="req${r.Status === "Cancelled" ? " cancelled" : ""}">
         <div class="req-top"><div>
           <div class="meta">${esc(r.ID)} · ${esc(r.Department)} · ${esc(r["Request Type"])}</div>
           <h4>${esc(r.Title)}</h4>
           <div class="meta">Needed by <b>${esc(r.Deadline)}</b> · by ${esc(r.Name)}${r["Assigned To"] ? " · with " + esc(r["Assigned To"]) : ""}</div>
         </div>
         <div><span class="st s-${esc(String(r.Status).replace(/ /g,"-"))}">${esc(r.Status)}</span>${r.Rush ? '<span class="st rush">Rush</span>' : ""}</div></div>
-        ${res ? `<a class="btn" ${linkAttrs(res)}>Open files ${svg("ext",2.2)}</a>` : ""}
+        ${(res || canCancel || canRevise) ? `<div class="req-actions">
+          ${res ? `<a class="btn small" ${linkAttrs(res)}>Open files ${svg("ext",2.2)}</a>` : ""}
+          ${canRevise ? `<button class="btn small ghost" type="button" data-act="revise" data-id="${esc(r.ID)}">Request revision</button>` : ""}
+          ${canCancel ? `<button class="btn small danger" type="button" data-act="cancel" data-id="${esc(r.ID)}">Cancel request</button>` : ""}
+          ${revs ? `<span class="meta">${revs} revision${revs > 1 ? "s" : ""} requested</span>` : ""}
+        </div>` : ""}
         <details><summary>Brief &amp; notes</summary>
           <p class="brief">${esc(r.Brief)}</p>
           ${r.Objective ? `<p class="meta">Objective: ${esc(r.Objective)}</p>` : ""}
           ${r.Channels ? `<p class="meta">Channels: ${esc(r.Channels)}</p>` : ""}
           ${ref ? `<p class="meta">Reference: <a ${linkAttrs(ref)}>open link</a></p>` : ""}
           ${r["Marketing Notes"] ? `<p class="meta"><b>Marketing notes:</b> ${esc(r["Marketing Notes"])}</p>` : ""}
+          ${r["Requester Notes"] ? `<p class="meta brief"><b>Requester updates:</b>\n${esc(r["Requester Notes"])}</p>` : ""}
         </details></div>`;
     }).join("") : '<div class="empty">No requests match.</div>';
   }
   ["#fStatus","#fDept"].forEach(s => $(s).onchange = renderBoard);
   $("#fSearch").oninput = renderBoard;
   $("#refresh").onclick = () => loadData();
+
+  /* ---------- Cancel / revision ---------- */
+  let actReq = null, actType = "";
+  $("#list").addEventListener("click", e => {
+    const b = e.target.closest("[data-act]"); if (!b) return;
+    actReq = rows.find(r => String(r.ID) === b.dataset.id); actType = b.dataset.act;
+    if (!actReq) return;
+    const rev = actType === "revise";
+    $("#aEyebrow").textContent = actReq.ID;
+    $("#aTitle").textContent = rev ? "Request a revision" : "Cancel this request";
+    $("#aSum").innerHTML = `<b>${esc(actReq.Title)}</b>${esc(actReq.Department)} · status: ${esc(actReq.Status)}`;
+    $("#aRevFields").hidden = !rev; $("#aCancelFields").hidden = rev;
+    $("#aSubmit").textContent = rev ? "Send revision" : "Cancel request";
+    $("#aSubmit").classList.toggle("danger", !rev);
+    $("#aBack").textContent = rev ? "Back" : "Keep request";
+    $("#actForm").reset(); $("#aErr").style.display = "none";
+    $("#actForm").hidden = false; $("#actDone").hidden = true;
+    $("#actModal").classList.add("show");
+    setTimeout(() => $("#aEmail").focus(), 50);
+  });
+  const closeAct = () => $("#actModal").classList.remove("show");
+  $("#aClose").onclick = $("#aBack").onclick = closeAct;
+  $("#aDoneBtn").onclick = () => { closeAct(); loadData(); };
+  $("#actModal").onclick = e => { if (e.target.id === "actModal") closeAct(); };
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && $("#actModal").classList.contains("show")) closeAct(); });
+  $("#actForm").onsubmit = async e => {
+    e.preventDefault();
+    const err = $("#aErr"), fail = m => { err.textContent = m; err.style.display = "block"; };
+    err.style.display = "none";
+    const email = $("#aEmail").value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { fail("Please enter the email you used for this request."); return; }
+    const data = { action: actType, id: actReq.ID, email };
+    if (actType === "revise") {
+      data.feedback = $("#aFeedback").value.trim(); data.reference = $("#aRef").value.trim();
+      if ((data.feedback.match(/\S+/g) || []).length < 3) { fail("Please describe what needs to change."); $("#aFeedback").focus(); return; }
+    } else data.reason = $("#aReason").value.trim();
+    const btn = $("#aSubmit"), label = btn.textContent; btn.disabled = true; btn.textContent = "Sending…";
+    try {
+      const out = await apiPost(data);
+      if (out.auth === false) { closeAct(); lock("Your session has ended. Please sign in again."); return; }
+      if (!out.ok) { fail(out.error || "Something went wrong. Please try again."); return; }
+      $("#aDoneText").textContent = actType === "revise"
+        ? `Your revision request for ${actReq.ID} has been sent to the marketing team. You'll get a confirmation email.`
+        : `${actReq.ID} has been cancelled. You'll get a confirmation email.`;
+      $("#actForm").hidden = true; $("#actDone").hidden = false;
+    } catch { fail("Something went wrong. Please try again in a moment."); }
+    finally { btn.disabled = false; btn.textContent = label; }
+  };
 
   /* ---------- Active nav link ---------- */
   const secs = ["brand","resources","track"].map(id => document.getElementById(id));
@@ -676,7 +821,9 @@
   let firstLoad = true;
   async function loadData(){
     try {
-      const out = (typeof DEMO_DATA !== "undefined") ? DEMO_DATA : await (await fetch(API_URL)).json();
+      const out = (typeof DEMO_DATA !== "undefined") ? DEMO_DATA : await apiGet();
+      if (out.auth === false) { lock(TOKEN ? "Your session has ended. Please sign in again." : ""); return; }
+      document.body.classList.remove("locked");
       rows = (out.rows || []).slice().reverse(); content = out.content || [];
       fillFilters(); renderBoard();
       if (firstLoad) { renderContent(); firstLoad = false; }
@@ -686,7 +833,23 @@
       if (firstLoad) ["#brandList","#resList"].forEach(s => $(s).innerHTML = msg);
     }
   }
-  loadData();
+  $("#loginForm").onsubmit = async e => {
+    e.preventDefault();
+    const err = $("#lErr"); err.style.display = "none";
+    const username = $("#lUser").value.trim(), password = $("#lPass").value;
+    if (!username || !password) { err.textContent = "Please enter the username and password."; err.style.display = "block"; return; }
+    const btn = $("#lBtn"); btn.disabled = true; btn.textContent = "Signing in…";
+    try {
+      const out = await (await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "login", username, password }) })).json();
+      if (!out.ok) { err.textContent = out.error || "Wrong username or password."; err.style.display = "block"; return; }
+      TOKEN = out.token; store.set("ybhub-token", TOKEN); $("#lPass").value = "";
+      await loadData();
+    } catch { err.textContent = "Could not connect. Please check your internet and try again."; err.style.display = "block"; }
+    finally { btn.disabled = false; btn.textContent = "Sign in"; }
+  };
+  $("#signOut").onclick = () => lock("");
+
+  if (TOKEN || typeof DEMO_DATA !== "undefined") loadData(); else lock("");
 </script>
 </body>
 </html>
